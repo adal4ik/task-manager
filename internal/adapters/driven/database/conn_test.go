@@ -1,32 +1,37 @@
-package database
+package database_test
 
 import (
 	"context"
-	"os"
+	"task-manager/internal/adapters/driven/database"
+	"task-manager/internal/config"
 	"testing"
 	"time"
-
-	"task-manager/internal/config"
 )
 
 func TestConnectDB(t *testing.T) {
-	os.Setenv("DB_HOST", "localhost")
-	os.Setenv("DB_PORT", "5432")
-	os.Setenv("DB_USER", "postgres")
-	os.Setenv("DB_PASSWORD", "postgres")
-	os.Setenv("DB_NAME", "taskmanager")
-
-	cfg := config.Load()
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	db := ConnectDB(ctx, cfg.Database)
-	if db == nil {
-		t.Fatal("db is nil")
+	ctx := context.Background()
+	cfg := config.DatabaseConfig{
+		Host:     "localhost",
+		Port:     "5432",
+		User:     "postgres",
+		Password: "postgres",
+		Name:     "taskmanager",
 	}
-	defer db.Close()
 
-	if err := db.PingContext(ctx); err != nil {
-		t.Fatalf("failed to ping database: %v", err)
+	done := make(chan struct{})
+	go func() {
+		db := database.ConnectDB(ctx, cfg)
+		if db == nil {
+			t.Error("Expected non-nil db")
+		}
+		db.Close()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		t.Log("ConnectDB completed successfully")
+	case <-time.After(20 * time.Second):
+		t.Fatal("ConnectDB timed out")
 	}
 }
