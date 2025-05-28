@@ -12,8 +12,6 @@ import (
 )
 
 func ConnectDB(ctx context.Context, cfg config.DatabaseConfig) *sql.DB {
-	time.Sleep(5 * time.Second)
-
 	connStr := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Name,
@@ -24,10 +22,23 @@ func ConnectDB(ctx context.Context, cfg config.DatabaseConfig) *sql.DB {
 		log.Fatalf("Failed to open DB: %v", err)
 	}
 
-	if err := db.PingContext(ctx); err != nil {
-		log.Fatalf("Database ping failed: %v", err)
-	}
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
 
-	log.Println("Successfully connected to the database!")
-	return db
+	ticker := time.NewTicker(2 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			log.Fatalf("Timeout: failed to connect to DB within the deadline: %v", ctx.Err())
+		case <-ticker.C:
+			if err := db.PingContext(ctx); err == nil {
+				log.Println("Successfully connected to the database!")
+				return db
+			} else {
+				log.Println("Database not ready yet, retrying...")
+			}
+		}
+	}
 }
