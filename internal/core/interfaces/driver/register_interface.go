@@ -1,5 +1,7 @@
 package driver
 
+import "context"
+
 type RegisterDriverInterface interface {
-	// RegisterUser registers a new user with the given details.
+	RegisterUser(ctx context.Context, login, hashPassword, email string) error
 }

@@ -3,6 +3,9 @@ CREATE TYPE task_status AS ENUM ('todo', 'done');
 CREATE TYPE task_priority AS ENUM ('low', 'medium', 'high');
 CREATE TYPE member_role AS ENUM ('owner', 'member');
 
+-- ===== EXTENSIONS =====
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- ===== USERS =====
 CREATE TABLE users (
     user_id     UUID PRIMARY KEY,

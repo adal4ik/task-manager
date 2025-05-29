@@ -8,6 +8,6 @@ import (
 
 func Router(handler handlers.Handler) *chi.Mux {
 	r := chi.NewRouter()
-	r.HandleFunc("POST /register", handler.RegisterHandler.RegisterUser)
+	r.Post("/register", handler.RegisterHandler.RegisterUser)
 	return r
 }

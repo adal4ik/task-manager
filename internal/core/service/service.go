@@ -5,9 +5,9 @@ import (
 )
 
 type Service struct {
-	RegisterService RegisterService
+	RegisterService *RegisterService
 }
 
 func NewService(repo *repository.Repository) *Service {
-	return &Service{RegisterService: *NewRegisterService(repo.RegisterRepo)}
+	return &Service{RegisterService: NewRegisterService(repo.RegisterRepo)}
 }
