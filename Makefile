@@ -9,7 +9,7 @@ logs:
 restart:
 	docker-compose restart
 db:
-	docker-compose exec -it taskmanager psql -U postgres taskmanager
+	docker-compose exec -it db psql -U postgres taskmanager
 help:
 	@echo "Available commands:"
 	@echo "  up      - Start the containers"
