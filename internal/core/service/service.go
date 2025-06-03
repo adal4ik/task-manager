@@ -6,8 +6,12 @@ import (
 
 type Service struct {
 	RegisterService *RegisterService
+	LoginService    *LoginService
 }
 
 func NewService(repo *repository.Repository) *Service {
-	return &Service{RegisterService: NewRegisterService(repo.RegisterRepo)}
+	return &Service{
+		RegisterService: NewRegisterService(repo.RegisterRepository),
+		LoginService:    NewLoginService(repo.LoginRepository),
+	}
 }

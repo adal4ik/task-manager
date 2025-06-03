@@ -23,3 +23,29 @@ func (r *RegisterRepository) RegisterUser(ctx context.Context, login, hashPasswo
 	}
 	return nil
 }
+
+func (r *RegisterRepository) CheckEmailExists(ctx context.Context, email string) (bool, error) {
+	query := `SELECT email FROM users WHERE email = $1`
+	var existingEmail string
+	err := r.db.QueryRowContext(ctx, query, email).Scan(&existingEmail)
+	if err != nil {
+		return false, err
+	}
+	if existingEmail == "" {
+		return false, nil // Email does not exist
+	}
+	return true, nil // Email exists
+}
+
+func (r *RegisterRepository) CheckLoginExists(ctx context.Context, login string) (bool, error) {
+	query := `SELECT login FROM users WHERE login = $1`
+	var existingLogin string
+	err := r.db.QueryRowContext(ctx, query, login).Scan(&existingLogin)
+	if err != nil {
+		return false, err
+	}
+	if existingLogin == "" {
+		return false, nil // Login does not exist
+	}
+	return true, nil // Login exists
+}

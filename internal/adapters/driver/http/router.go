@@ -9,5 +9,6 @@ import (
 func Router(handler handlers.Handler) *chi.Mux {
 	r := chi.NewRouter()
 	r.Post("/register", handler.RegisterHandler.RegisterUser)
+	r.Post("/login", handler.LoginHandler.LoginUser)
 	return r
 }

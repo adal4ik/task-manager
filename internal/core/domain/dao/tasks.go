@@ -7,11 +7,11 @@ import (
 )
 
 type Tasks struct {
-	TaskID      uuid.UUID
-	WorkspaceID uuid.UUID
-	UserID      uuid.UUID
-	Title       string
-	Status      string
-	Priority    string
-	CreatedAt   time.Time
+	TaskID    uuid.UUID
+	UserID    uuid.UUID
+	Title     string
+	Status    string
+	Priority  string
+	DueDate   time.Time
+	CreatedAt time.Time
 }

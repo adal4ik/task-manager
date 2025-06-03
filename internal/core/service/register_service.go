@@ -9,10 +9,10 @@ import (
 )
 
 type RegisterService struct {
-	repo driven.RegisterDriverInterface
+	repo driven.RegisterDrivenInterface
 }
 
-func NewRegisterService(repo driven.RegisterDriverInterface) *RegisterService {
+func NewRegisterService(repo driven.RegisterDrivenInterface) *RegisterService {
 	return &RegisterService{
 		repo: repo,
 	}
@@ -25,4 +25,19 @@ func (r *RegisterService) RegisterUser(ctx context.Context, login, password, ema
 		return err
 	}
 	return r.repo.RegisterUser(ctx, login, hashPassword, email, userID)
+}
+
+func (r *RegisterService) CheckEmailExists(ctx context.Context, email string) (bool, error) {
+	exists, err := r.repo.CheckEmailExists(ctx, email)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+func (r *RegisterService) CheckLoginExists(ctx context.Context, login string) (bool, error) {
+	exists, err := r.repo.CheckLoginExists(ctx, login)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }

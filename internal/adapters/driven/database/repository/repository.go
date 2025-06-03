@@ -3,9 +3,13 @@ package repository
 import "database/sql"
 
 type Repository struct {
-	RegisterRepo *RegisterRepository
+	RegisterRepository *RegisterRepository
+	LoginRepository    *LoginRepository
 }
 
 func NewRepository(db *sql.DB) *Repository {
-	return &Repository{RegisterRepo: NewRegisterRepository(db)}
+	return &Repository{
+		RegisterRepository: NewRegisterRepository(db),
+		LoginRepository:    NewLoginRepository(db),
+	}
 }
