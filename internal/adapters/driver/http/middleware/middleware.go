@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type contextKey string
+type ContextKey string
 
-const userIDKey contextKey = "userID"
+const UserIDKey ContextKey = "userID"
 
 func AuthenticateJWT(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -33,7 +34,7 @@ func AuthenticateJWT(next http.Handler) http.Handler {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return []byte("your_secret_key"), nil
+			return []byte(os.Getenv("JWT_SECRET_KEY")), nil
 		})
 
 		if err != nil || !token.Valid {
@@ -53,7 +54,7 @@ func AuthenticateJWT(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(req.Context(), userIDKey, userID)
+		ctx := context.WithValue(req.Context(), UserIDKey, userID)
 		req = req.WithContext(ctx)
 
 		next.ServeHTTP(w, req)

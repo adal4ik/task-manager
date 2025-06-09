@@ -29,7 +29,7 @@ func TestAuthenticateJWT_Success(t *testing.T) {
 	handlerCalled := false
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		handlerCalled = true
-		val := r.Context().Value(userIDKey)
+		val := r.Context().Value(UserIDKey)
 		assert.Equal(t, userID, val)
 		w.WriteHeader(http.StatusOK)
 	})
