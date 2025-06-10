@@ -2,13 +2,11 @@ package dao
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Tasks struct {
-	TaskID    uuid.UUID
-	UserID    uuid.UUID
+	TaskID    string
+	UserID    string
 	Title     string
 	Status    string
 	Priority  string

@@ -2,9 +2,10 @@ package driven
 
 import (
 	"context"
-	"task-manager/internal/core/domain/dto"
+	"task-manager/internal/core/domain/dao"
 )
 
-type TasksDrivenInteface interface {
-	CreateTask(ctx context.Context, task dto.Task) error
+type TasksDrivenInterface interface {
+	CreateTask(ctx context.Context, taskDao dao.Tasks) error
+	GetTasks(ctx context.Context, userID string) ([]dao.Tasks, error)
 }

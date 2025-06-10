@@ -7,4 +7,5 @@ import (
 
 type TasksDriverInterface interface {
 	CreateTask(ctx context.Context, task dto.Task) error
+	GetTasks(ctx context.Context, userID string) ([]dto.Task, error)
 }

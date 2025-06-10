@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"task-manager/internal/adapters/driver/http/middleware"
 	"task-manager/internal/core/domain/dto"
-	"task-manager/internal/core/interfaces/driven"
+	"task-manager/internal/core/interfaces/driver"
 	"task-manager/internal/utils"
 )
 
 type TaskHandler struct {
-	service driven.TasksDrivenInteface
+	service driver.TasksDriverInterface
 	BaseHandler
 }
 
-func NewTaskHandler(service driven.TasksDrivenInteface, basehandler BaseHandler) *TaskHandler {
+func NewTaskHandler(service driver.TasksDriverInterface, basehandler BaseHandler) *TaskHandler {
 	return &TaskHandler{
 		BaseHandler: basehandler,
 		service:     service,
@@ -46,4 +46,25 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, req *http.Request) {
 		Message: "Task created successfully",
 	}
 	resp.Send(w)
+}
+
+func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
+	userID, ok := req.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		t.handleError(w, req, http.StatusUnauthorized, "User ID not found in context", nil)
+		return
+	}
+	tasks, err := t.service.GetTasks(req.Context(), userID)
+	if err != nil {
+		t.handleError(w, req, http.StatusInternalServerError, "Failed to get tasks", err)
+		return
+	}
+	jsonData, err := json.Marshal(tasks)
+	if err != nil {
+		t.handleError(w, req, http.StatusInternalServerError, "Failed to marshal tasks", err)
+		return
+	}
+	// json.NewEncoder(w).Encode(tasks)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }

@@ -32,6 +32,7 @@ func (r *RegisterRepository) CheckEmailExists(ctx context.Context, email string)
 		if err == sql.ErrNoRows {
 			return false, nil
 		}
+		return false, err // Return error if any other error occurs
 	}
 	if existingEmail == "" {
 		return false, nil // Email does not exist
@@ -47,6 +48,7 @@ func (r *RegisterRepository) CheckLoginExists(ctx context.Context, login string)
 		if err == sql.ErrNoRows {
 			return false, nil
 		}
+		return false, err // Return error if any other error occurs
 	}
 	if existingLogin == "" {
 		return false, nil // Login does not exist
