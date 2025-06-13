@@ -15,6 +15,7 @@ func Router(handler handlers.Handler) *chi.Mux {
 		r.Use(middleware.AuthenticateJWT)
 		r.Post("/task", handler.TaskHandler.CreateTask)
 		r.Get("/tasks", handler.TaskHandler.GetTasks)
+		r.Patch("/task/{task_id}", handler.TaskHandler.PutTask)
 	})
 	return r
 }

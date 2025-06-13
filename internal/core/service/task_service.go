@@ -35,3 +35,11 @@ func (t *TaskService) GetTasks(ctx context.Context, userID string) ([]dto.Task, 
 	}
 	return taskDtos, nil
 }
+
+func (t *TaskService) UpdateTask(ctx context.Context, task dto.Task, TaskID string) error {
+	var taskDao, err = dto.TaskToDao(task)
+	if err != nil {
+		return err
+	}
+	return t.repo.UpdateTask(ctx, taskDao, TaskID)
+}

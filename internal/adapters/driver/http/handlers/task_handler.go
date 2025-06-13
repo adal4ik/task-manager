@@ -7,6 +7,8 @@ import (
 	"task-manager/internal/core/domain/dto"
 	"task-manager/internal/core/interfaces/driver"
 	"task-manager/internal/utils"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type TaskHandler struct {
@@ -67,4 +69,30 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
 	// json.NewEncoder(w).Encode(tasks)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
+}
+
+func (t *TaskHandler) PutTask(w http.ResponseWriter, req *http.Request) {
+	taskID := chi.URLParam(req, "task_id")
+	if taskID == "" {
+		t.handleError(w, req, http.StatusBadRequest, "Task ID is required", nil)
+		return
+	}
+	data := json.NewDecoder(req.Body)
+	var task dto.Task
+	err := data.Decode(&task)
+	if err != nil {
+		t.handleError(w, req, http.StatusInternalServerError, "Failed to decode request body", err)
+		return
+	}
+	userID, ok := req.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		t.handleError(w, req, http.StatusUnauthorized, "User ID not found in context", nil)
+		return
+	}
+	task.UserID = userID
+	err = t.service.UpdateTask(req.Context(), task, taskID)
+	if err != nil {
+		t.handleError(w, req, http.StatusInternalServerError, "Failed to update task", err)
+		return
+	}
 }

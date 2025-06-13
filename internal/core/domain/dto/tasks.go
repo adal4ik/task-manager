@@ -7,17 +7,19 @@ import (
 )
 
 type Task struct {
-	UserID    string `json:"user_id"`
-	Title     string `json:"title"`
-	Status    string `json:"status"`
-	Priority  string `json:"priority"`
-	DueDate   string `json:"due_date"`   // ISO 8601 format
-	CreatedAt string `json:"created_at"` // ISO 8601 format
+	TaskID    string     `json:"task_id,omitempty"`
+	UserID    string     `json:"user_id,omitempty"`
+	Title     *string    `json:"title,omitempty"`
+	Status    *string    `json:"status,omitempty"`
+	Priority  *string    `json:"priority,omitempty"`
+	DueDate   *time.Time `json:"due_date,omitempty"`
+	CreatedAt string     `json:"created_at,omitempty"`
 }
 
 func TaskToDao(task Task) (dao.Tasks, error) {
 	var createdAt time.Time
 	var err error
+
 	if task.CreatedAt == "" {
 		createdAt = time.Now().UTC()
 	} else {
@@ -27,28 +29,30 @@ func TaskToDao(task Task) (dao.Tasks, error) {
 		}
 	}
 
-	dueDate, err := time.Parse(time.RFC3339, task.DueDate)
-	if err != nil {
-		return dao.Tasks{}, fmt.Errorf("invalid due_date: %w", err)
-	}
-
 	return dao.Tasks{
+		TaskID:    task.TaskID,
 		UserID:    task.UserID,
 		Title:     task.Title,
 		Status:    task.Status,
 		Priority:  task.Priority,
-		DueDate:   dueDate,
+		DueDate:   task.DueDate,
 		CreatedAt: createdAt,
 	}, nil
 }
 
 func DaoToTask(task dao.Tasks) Task {
+	var dueDate *time.Time
+	if task.DueDate != nil {
+		dueDate = task.DueDate
+	}
+
 	return Task{
+		TaskID:    task.TaskID,
 		UserID:    task.UserID,
 		Title:     task.Title,
 		Status:    task.Status,
 		Priority:  task.Priority,
-		DueDate:   task.DueDate.Format(time.RFC3339),
+		DueDate:   dueDate,
 		CreatedAt: task.CreatedAt.Format(time.RFC3339),
 	}
 }
