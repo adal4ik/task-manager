@@ -71,7 +71,7 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
 	w.Write(jsonData)
 }
 
-func (t *TaskHandler) PutTask(w http.ResponseWriter, req *http.Request) {
+func (t *TaskHandler) PatchTask(w http.ResponseWriter, req *http.Request) {
 	taskID := chi.URLParam(req, "task_id")
 	if taskID == "" {
 		t.handleError(w, req, http.StatusBadRequest, "Task ID is required", nil)
