@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"task-manager/internal/core/domain/dao"
+	"task-manager/internal/utils"
 )
 
 type TaskRepository struct {
@@ -82,4 +83,16 @@ func (t *TaskRepository) UpdateTask(ctx context.Context, task dao.Tasks, taskID 
 
 	_, err := t.db.ExecContext(ctx, query, args...)
 	return err
+}
+
+func (t *TaskRepository) DeleteTask(ctx context.Context, userID string, taskID string) error {
+	query := `DELETE FROM tasks WHERE user_id = $1 AND task_id = $2`
+	_, err := t.db.ExecContext(ctx, query, userID, taskID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return utils.ErrNoRows
+		}
+		return err
+	}
+	return nil
 }

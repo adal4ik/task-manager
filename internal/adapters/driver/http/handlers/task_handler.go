@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"task-manager/internal/adapters/driver/http/middleware"
 	"task-manager/internal/core/domain/dto"
@@ -95,4 +96,31 @@ func (t *TaskHandler) PatchTask(w http.ResponseWriter, req *http.Request) {
 		t.handleError(w, req, http.StatusInternalServerError, "Failed to update task", err)
 		return
 	}
+}
+
+func (t *TaskHandler) DeleteTask(w http.ResponseWriter, req *http.Request) {
+	taskID := chi.URLParam(req, "task_id")
+	if taskID == "" {
+		t.handleError(w, req, http.StatusBadRequest, "Task ID is required", nil)
+		return
+	}
+	userID, ok := req.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		t.handleError(w, req, http.StatusUnauthorized, "User ID not found in context", nil)
+		return
+	}
+	err := t.service.DeleteTask(req.Context(), userID, taskID)
+	if err != nil {
+		if errors.Is(err, utils.ErrNoRows) {
+			t.handleError(w, req, http.StatusBadRequest, "Task not found", err)
+			return
+		}
+		t.handleError(w, req, http.StatusInternalServerError, "Something went wrong", err)
+		return
+	}
+	resp := utils.APIResponse{
+		Code:    204,
+		Message: "Successfuly deleted",
+	}
+	resp.Send(w)
 }

@@ -16,6 +16,7 @@ func Router(handler handlers.Handler) *chi.Mux {
 		r.Post("/task", handler.TaskHandler.CreateTask)
 		r.Get("/tasks", handler.TaskHandler.GetTasks)
 		r.Patch("/task/{task_id}", handler.TaskHandler.PatchTask)
+		r.Delete("/task/{task_id}", handler.TaskHandler.DeleteTask)
 	})
 	return r
 }
