@@ -52,12 +52,14 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, req *http.Request) {
 }
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
+	status := req.URL.Query().Get("status")
+	priority := req.URL.Query().Get("priority")
 	userID, ok := req.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		t.handleError(w, req, http.StatusUnauthorized, "User ID not found in context", nil)
 		return
 	}
-	tasks, err := t.service.GetTasks(req.Context(), userID)
+	tasks, err := t.service.GetTasks(req.Context(), userID, status, priority)
 	if err != nil {
 		t.handleError(w, req, http.StatusInternalServerError, "Failed to get tasks", err)
 		return
@@ -112,7 +114,7 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, req *http.Request) {
 	err := t.service.DeleteTask(req.Context(), userID, taskID)
 	if err != nil {
 		if errors.Is(err, utils.ErrNoRows) {
-			t.handleError(w, req, http.StatusBadRequest, "Task not found", err)
+			t.handleError(w, req, http.StatusNotFound, "Task not found", err)
 			return
 		}
 		t.handleError(w, req, http.StatusInternalServerError, "Something went wrong", err)

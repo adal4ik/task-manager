@@ -28,9 +28,23 @@ func (t *TaskRepository) CreateTask(ctx context.Context, task dao.Tasks) error {
 	return nil
 }
 
-func (t *TaskRepository) GetTasks(ctx context.Context, userID string) ([]dao.Tasks, error) {
-	query := `SELECT task_id,user_id, title, status, priority, due_date, created_at FROM tasks WHERE user_id = $1`
-	rows, err := t.db.QueryContext(ctx, query, userID)
+func (t *TaskRepository) GetTasks(ctx context.Context, userID string, status string, priority string) ([]dao.Tasks, error) {
+	query := `SELECT task_id, user_id, title, status, priority, due_date, created_at FROM tasks WHERE user_id = $1`
+	args := []interface{}{userID}
+	argIndex := 2
+
+	if status != "" {
+		query += fmt.Sprintf(" AND status = $%d", argIndex)
+		args = append(args, status)
+		argIndex++
+	}
+
+	if priority != "" {
+		query += fmt.Sprintf(" AND priority = $%d", argIndex)
+		args = append(args, priority)
+	}
+
+	rows, err := t.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +53,22 @@ func (t *TaskRepository) GetTasks(ctx context.Context, userID string) ([]dao.Tas
 	var tasks []dao.Tasks
 	for rows.Next() {
 		var task dao.Tasks
-		if err := rows.Scan(&task.TaskID, &task.UserID, &task.Title, &task.Status, &task.Priority, &task.DueDate, &task.CreatedAt); err != nil {
+		err := rows.Scan(
+			&task.TaskID,
+			&task.UserID,
+			&task.Title,
+			&task.Status,
+			&task.Priority,
+			&task.DueDate,
+			&task.CreatedAt,
+		)
+		if err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 

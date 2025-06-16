@@ -24,8 +24,8 @@ func (t *TaskService) CreateTask(ctx context.Context, task dto.Task) error {
 	return t.repo.CreateTask(ctx, taskDao)
 }
 
-func (t *TaskService) GetTasks(ctx context.Context, userID string) ([]dto.Task, error) {
-	tasks, err := t.repo.GetTasks(ctx, userID)
+func (t *TaskService) GetTasks(ctx context.Context, userID string, status string, priority string) ([]dto.Task, error) {
+	tasks, err := t.repo.GetTasks(ctx, userID, status, priority)
 	if err != nil {
 		return nil, err
 	}
