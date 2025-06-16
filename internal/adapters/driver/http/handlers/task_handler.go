@@ -52,6 +52,9 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, req *http.Request) {
 }
 
 func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
+	sortBy := req.URL.Query().Get("sortBy")
+	orderBy := req.URL.Query().Get("orderBy")
+	search := req.URL.Query().Get("search")
 	status := req.URL.Query().Get("status")
 	priority := req.URL.Query().Get("priority")
 	userID, ok := req.Context().Value(middleware.UserIDKey).(string)
@@ -59,7 +62,7 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
 		t.handleError(w, req, http.StatusUnauthorized, "User ID not found in context", nil)
 		return
 	}
-	tasks, err := t.service.GetTasks(req.Context(), userID, status, priority)
+	tasks, err := t.service.GetTasks(req.Context(), userID, status, priority, search, orderBy, sortBy)
 	if err != nil {
 		t.handleError(w, req, http.StatusInternalServerError, "Failed to get tasks", err)
 		return
@@ -69,7 +72,7 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
 		t.handleError(w, req, http.StatusInternalServerError, "Failed to marshal tasks", err)
 		return
 	}
-	// json.NewEncoder(w).Encode(tasks)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
 }

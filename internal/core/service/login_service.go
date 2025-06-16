@@ -24,26 +24,26 @@ func NewLoginService(repo driven.LoginDrivenInterface) *LoginService {
 func (l *LoginService) LoginUser(ctx context.Context, login, password string) (string, error) {
 	user, err := l.repo.GetUserByLogin(ctx, login)
 	if err != nil {
-		return "", err // Handle error from repository
+		return "", err
 	}
 	if user.Login == "" {
-		return "", utils.ErrNoRows // Handle case where user is not found
+		return "", utils.ErrNoRows
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return "", utils.ErrInvalidCredentials // Handle invalid password
+		return "", utils.ErrInvalidCredentials
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.UserID,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(), // Token expiration time
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	})
 	secret := os.Getenv("JWT_SECRET_KEY")
 	if secret == "" {
-		return "", utils.ErrMissingSecret // Handle missing secret key
+		return "", utils.ErrMissingSecret
 	}
-	tokenString, err := token.SignedString([]byte(secret)) // Replace with your secret key
+	tokenString, err := token.SignedString([]byte(secret))
 	if err != nil {
-		return "", err // Handle error during token signing
+		return "", err
 	}
-	return tokenString, nil // Return the generated JWT token
+	return tokenString, nil
 }

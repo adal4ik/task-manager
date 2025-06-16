@@ -28,7 +28,7 @@ func (t *TaskRepository) CreateTask(ctx context.Context, task dao.Tasks) error {
 	return nil
 }
 
-func (t *TaskRepository) GetTasks(ctx context.Context, userID string, status string, priority string) ([]dao.Tasks, error) {
+func (t *TaskRepository) GetTasks(ctx context.Context, userID string, status string, priority string, search string, orderBy string, sortBy string) ([]dao.Tasks, error) {
 	query := `SELECT task_id, user_id, title, status, priority, due_date, created_at FROM tasks WHERE user_id = $1`
 	args := []interface{}{userID}
 	argIndex := 2
@@ -42,7 +42,27 @@ func (t *TaskRepository) GetTasks(ctx context.Context, userID string, status str
 	if priority != "" {
 		query += fmt.Sprintf(" AND priority = $%d", argIndex)
 		args = append(args, priority)
+		argIndex++
 	}
+
+	if search != "" {
+		query += fmt.Sprintf(" AND title ILIKE $%d", argIndex)
+		args = append(args, "%"+search+"%")
+		argIndex++
+	}
+
+	switch orderBy {
+	case "due_date", "created_at":
+		// Ок
+	default:
+		orderBy = "created_at"
+	}
+
+	if sortBy != "asc" && sortBy != "desc" {
+		sortBy = "asc"
+	}
+
+	query += fmt.Sprintf(" ORDER BY %s %s", orderBy, sortBy)
 
 	rows, err := t.db.QueryContext(ctx, query, args...)
 	if err != nil {
