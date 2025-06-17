@@ -47,3 +47,7 @@ func (t *TaskService) UpdateTask(ctx context.Context, task dto.Task, TaskID stri
 func (t *TaskService) DeleteTask(ctx context.Context, userID string, taskID string) error {
 	return t.repo.DeleteTask(ctx, userID, taskID)
 }
+
+func (t *TaskService) UpdateTaskStatus(ctx context.Context, userID string, taskID string, status string) error {
+	return t.repo.UpdateTaskStatus(ctx, userID, taskID, status)
+}

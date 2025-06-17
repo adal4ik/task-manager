@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"task-manager/internal/adapters/driver/http/middleware"
 	"task-manager/internal/core/domain/dto"
@@ -128,4 +129,48 @@ func (t *TaskHandler) DeleteTask(w http.ResponseWriter, req *http.Request) {
 		Message: "Successfuly deleted",
 	}
 	resp.Send(w)
+}
+
+func (t *TaskHandler) UpdateTaskStatus(w http.ResponseWriter, req *http.Request) {
+	decoder := json.NewDecoder(req.Body)
+	var status dto.UpdateStatus
+	err := decoder.Decode(&status)
+	if err != nil {
+		t.handleError(w, req, http.StatusInternalServerError, "Failed to decode request body", err)
+		return
+	}
+	if status.Status != "done" && status.Status != "todo" {
+		t.handleError(w, req, http.StatusBadRequest, "No", nil)
+		return
+	}
+	taskID := chi.URLParam(req, "task_id")
+	if taskID == "" {
+		t.handleError(w, req, http.StatusBadRequest, "Task ID is required", nil)
+		return
+	}
+	userID, ok := req.Context().Value(middleware.UserIDKey).(string)
+	if !ok {
+		t.handleError(w, req, http.StatusUnauthorized, "User ID not found in context", nil)
+		return
+	}
+	err = t.service.UpdateTaskStatus(req.Context(), userID, taskID, status.Status)
+	if err != nil {
+		if errors.Is(err, utils.ErrNoRows) {
+			t.handleError(w, req, http.StatusNotFound, "Task not found", err)
+			return
+		}
+		t.handleError(w, req, http.StatusInternalServerError, "Something went wrong", err)
+		return
+	}
+	resp := utils.APIResponse{
+		Code:    200,
+		Message: fmt.Sprintf("Updated to %s", status.Status),
+	}
+	resp.Send(w)
+	t.logger.Info(
+		"Updated",
+		"userID", userID,
+		"taskID", taskID,
+		"status", status.Status,
+	)
 }

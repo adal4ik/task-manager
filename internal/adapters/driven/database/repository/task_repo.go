@@ -139,3 +139,15 @@ func (t *TaskRepository) DeleteTask(ctx context.Context, userID string, taskID s
 	}
 	return nil
 }
+
+func (t *TaskRepository) UpdateTaskStatus(ctx context.Context, userID string, taskID string, status string) error {
+	query := `UPDATE tasks SET status = $1 WHERE user_id = $2 AND task_id = $3`
+	_, err := t.db.ExecContext(ctx, query, status, userID, taskID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return utils.ErrNoRows
+		}
+		return err
+	}
+	return nil
+}

@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type UpdateStatus struct {
+	Status string `json:"status"`
+}
+
 type Task struct {
 	TaskID    string     `json:"task_id,omitempty"`
 	UserID    string     `json:"user_id,omitempty"`

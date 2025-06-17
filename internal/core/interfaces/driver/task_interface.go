@@ -10,4 +10,5 @@ type TasksDriverInterface interface {
 	GetTasks(ctx context.Context, userID string, status string, priority string, search string, orderBy string, sortBy string) ([]dto.Task, error)
 	UpdateTask(ctx context.Context, task dto.Task, taskID string) error
 	DeleteTask(ctx context.Context, userID string, taskID string) error
+	UpdateTaskStatus(ctx context.Context, userID string, taskID string, status string) error
 }
