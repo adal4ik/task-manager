@@ -5,15 +5,13 @@ import (
 )
 
 type Service struct {
-	RegisterService *RegisterService
-	LoginService    *LoginService
-	TaskService     *TaskService
+	AuthService *AuthService
+	TaskService *TaskService
 }
 
 func NewService(repo *repository.Repository) *Service {
 	return &Service{
-		RegisterService: NewRegisterService(repo.RegisterRepository),
-		LoginService:    NewLoginService(repo.LoginRepository),
-		TaskService:     NewTaskService(repo.TaskRepository),
+		AuthService: NewAuthService(repo.AuthRepository),
+		TaskService: NewTaskService(repo.TaskRepository),
 	}
 }

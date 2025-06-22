@@ -31,15 +31,13 @@ func NewBaseHandler(logger slog.Logger) *BaseHandler {
 }
 
 type Handler struct {
-	RegisterHandler *RegisterHandler
-	LoginHandler    *LoginHandler
-	TaskHandler     *TaskHandler
+	AuthHandler *AuthHandler
+	TaskHandler *TaskHandler
 }
 
 func NewHandler(services *service.Service, baseHandler BaseHandler) *Handler {
 	return &Handler{
-		RegisterHandler: NewRegisterHandler(services.RegisterService, baseHandler),
-		LoginHandler:    NewLoginHandler(services.LoginService, baseHandler),
-		TaskHandler:     NewTaskHandler(services.TaskService, baseHandler),
+		AuthHandler: NewAuthHandler(services.AuthService, baseHandler),
+		TaskHandler: NewTaskHandler(services.TaskService, baseHandler),
 	}
 }

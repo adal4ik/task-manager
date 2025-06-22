@@ -9,8 +9,8 @@ import (
 
 func Router(handler handlers.Handler) *chi.Mux {
 	r := chi.NewRouter()
-	r.Post("/register", handler.RegisterHandler.RegisterUser)
-	r.Post("/login", handler.LoginHandler.LoginUser)
+	r.Post("/register", handler.AuthHandler.RegisterUser)
+	r.Post("/login", handler.AuthHandler.LoginUser)
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthenticateJWT)
 		r.Post("/task", handler.TaskHandler.CreateTask)
