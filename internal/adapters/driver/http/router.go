@@ -13,9 +13,10 @@ func Router(handler handlers.Handler) *chi.Mux {
 	r.Post("/login", handler.AuthHandler.LoginUser)
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthenticateJWT)
+		r.Post("/logout", handler.AuthHandler.LogoutUser)
 		r.Post("/task", handler.TaskHandler.CreateTask)
 		r.Get("/tasks", handler.TaskHandler.GetTasks)
-		r.Patch("/task/{task_id}", handler.TaskHandler.PatchTask)
+		r.Patch("/task/{task_id}", handler.TaskHandler.UpdateTaskStatus)
 		r.Delete("/task/{task_id}", handler.TaskHandler.DeleteTask)
 		r.Patch("/task/{task_id}/status", handler.TaskHandler.UpdateTaskStatus)
 	})

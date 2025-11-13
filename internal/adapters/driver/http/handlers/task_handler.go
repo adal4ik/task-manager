@@ -33,6 +33,11 @@ func (t *TaskHandler) CreateTask(w http.ResponseWriter, req *http.Request) {
 		t.handleError(w, req, http.StatusInternalServerError, "Failed to decode request body", err)
 		return
 	}
+	if task.Title == nil || *task.Title == "" {
+		t.handleError(w, req, http.StatusBadRequest, "Title is required", nil)
+		return
+	}
+
 	userID, ok := req.Context().Value(middleware.UserIDKey).(string)
 	if !ok {
 		t.handleError(w, req, http.StatusUnauthorized, "User ID not found in context", nil)
@@ -78,7 +83,7 @@ func (t *TaskHandler) GetTasks(w http.ResponseWriter, req *http.Request) {
 	w.Write(jsonData)
 }
 
-func (t *TaskHandler) PatchTask(w http.ResponseWriter, req *http.Request) {
+func (t *TaskHandler) UpdateTask(w http.ResponseWriter, req *http.Request) {
 	taskID := chi.URLParam(req, "task_id")
 	if taskID == "" {
 		t.handleError(w, req, http.StatusBadRequest, "Task ID is required", nil)
