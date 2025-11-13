@@ -69,7 +69,7 @@ make up
 make down
 ```
 ---
-# 🧪 Usage Examples (REST API)
+## 🧪 Usage Examples (REST API)
 
 ## Create Task
 ```bash
@@ -95,8 +95,8 @@ curl -X PUT http://localhost:8080/tasks/1 \
 curl -X DELETE http://localhost:8080/tasks/1
 ```
 ---
-# Architecture
-```bash
+## Architecture
+```text
 .
 ├── cmd
 │   └── task-manager
@@ -157,5 +157,5 @@ curl -X DELETE http://localhost:8080/tasks/1
         └── tasks.html
 ```
 ---
-# Author
-Adilet Rabaev(adal4ik)
+## Author
+**Adilet Rabaev(adal4ik)**
